@@ -12,36 +12,61 @@ const app = express();
 
 app.set('view engine', 'ejs');
 
-app.use(bodyParser.urlencoded({extended: true}));
+let blogs = [];
+
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-app.get('/',function(re,res){
-  res.render("home",{StartingContent : homeStartingContent});
+app.get('/', function (re, res) {
+  res.render("home", {
+    StartingContent: homeStartingContent,
+    blogs: blogs
+  });
 });
 
-app.get('/about',function(re,res){
-  res.render("about",{aboutContent :aboutContent });
+
+
+app.get('/about', function (re, res) {
+  res.render("about", { aboutContent: aboutContent });
 })
-app.get('/contact',function(re,res){
-  res.render("contact",{contactContent : contactContent});
+app.get('/contact', function (re, res) {
+  res.render("contact", { contactContent: contactContent });
 })
 
-app.get('/compose',function(re,res){
+app.get('/compose', function (re, res) {
   res.render("compose");
 
 })
 
-app.post('/compose',function(re,res){
-  let post=re.body.text;
-  console.log(post);
+app.post('/compose', function (re, res) {
+
+  const blog = {
+    title: re.body.title,
+    post: re.body.post
+  };
+  blogs.push(blog);
+  // console.log(blogs);
+  res.redirect('/');
+
+})
+
+app.get('/tags/:tag', function (re, res) {
+  const reTitle = re.params.tag;
+  blogs.forEach(function(blog){
+ 
+    if (blog.title === reTitle) {
+      console.log("Match found !!!");
+      // break;
+    }else{
+      console.log("Not found");
+    }
+});
 })
 
 
 
 
 
-
-
-app.listen(3000, function() {
+app.listen(3000, function () {
   console.log("Server started on port 3000");
 });
