@@ -28,10 +28,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 app.get('/', function (re, res) {
-  res.render("home", {
-    StartingContent: homeStartingContent,
-    blogs: blogs
-  });
+  blogs.find((err,blogs)=>{
+    if(!err)
+    {
+      res.render("home", { 
+        StartingContent: homeStartingContent,
+        blogs : blogs  
+      });
+    }
+  })
 });
 
 
@@ -50,11 +55,11 @@ app.get('/compose', function (re, res) {
 
 app.post('/compose', function (re, res) {
 
-  const blog = {
+  const blog = new blogs({
     title: re.body.title,
     post: re.body.post
-  };
-  blogs.push(blog);
+  });
+  blog.save();
   // console.log(blogs);
   res.redirect('/');
 
@@ -62,14 +67,20 @@ app.post('/compose', function (re, res) {
 
 app.get('/test/:tag', function (re, res) {
   const reTitle = _.lowerCase(re.params.tag);
-  blogs.forEach(function(blog){
-    const blogTitle=_.lowerCase(blog.title);
-    if (blogTitle === reTitle) {
-     res.render('post',{title:blog.title, content:blog.post});
-    
+  blogs.find((err,blogs)=>{
+    if(!err)
+    {
+      blogs.forEach(function(blog){
+        const blogTitle=_.lowerCase(blog.title);
+        if (blogTitle === reTitle) {
+         res.render('post',{title:blog.title, content:blog.post});
+        
+        }
+       
+    });
     }
-   
-});
+  })
+
 })
 
 
